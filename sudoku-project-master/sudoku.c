@@ -50,7 +50,24 @@ int main(int argc, char *argv[])
         printf("We are using worker threads.\n");
     }
 
+    printf("Enter a sudoku solution\n");
+    int test = 0;
+    int myArray[9][9];
 
+    for(int i = 0; i < 9; i++) {
+        for (int j = 0 ; j < 9; j++) {
+            scanf("%d",&test);
+            myArray[i][j] = test;
+        }
+    }
+
+
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            printf("%d ", myArray[i][j]);
+        }
+        printf("\n");
+    }
     return 0;
 }
 
