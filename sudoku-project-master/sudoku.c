@@ -42,8 +42,8 @@ void parse_args(int argc, char *argv[])
     }
 }
 
-void row_Valid(int m, int n, int array[m][n]);
-void col_Valid(int m, int n, int array[m][n]);
+void row_Valid(int rowNumber, struct Sudoku sudoku);
+void col_Valid(int colNumber, struct Sudoku sudoku);
 void subGrid_Valid(int array[9][9]);
 
 
@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
             mySudoku.array[i][j] = test;
         }
     }
-    row_Valid(0, 0, &mySudoku.array);
-    col_Valid(0, 0, &mySudoku.array);
+    row_Valid(3, mySudoku);
+    col_Valid(4, mySudoku);
 
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
@@ -81,32 +81,31 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void row_Valid(int m, int n, int array[m][n]) {
+void row_Valid(int rowNumber, struct Sudoku sudoku) {
     bool testArray[9] = {0,0,0,0,0,0,0,0,0};
 
     for (int i = 0; i < 9; i++) {
-        int number = array[m][i];
-        if(array[m][i] < 1 || array[m][i] > 9 || testArray[(array[m][i])-1] == 1) {
-            printf("Row %d doesn't have the required values.\n", m + 1);
+        int number = sudoku.array[rowNumber][i];
+        if(sudoku.array[rowNumber][i] < 1 || sudoku.array[rowNumber][i] > 9 || testArray[(sudoku.array[rowNumber][i])-1] == 1) {
+            printf("Row %d doesn't have the required values.\n", rowNumber + 1);
             return;
         }
         else {
-            testArray[array[m][i]-1] = 1;
+            testArray[sudoku.array[rowNumber][i]-1] = 1;
         }
     }
 }
 
-void col_Valid(int m, int n, int array[m][n]) {
+void col_Valid(int colNumber, struct Sudoku sudoku) {
     bool testArray[9] = {0,0,0,0,0,0,0,0,0};
 
     for (int i = 0; i < 9; i++) {
-        int number = array[i][n];
-        if (array[i][n] < 1 || array[i][n] > 9 || testArray[(array[i][n])-1] == 1) {
-            printf("Column %d doesn't have the required values.\n", n + 1);
+        if (sudoku.array[i][colNumber] < 1 || sudoku.array[i][colNumber] > 9 || testArray[(sudoku.array[i][colNumber])-1] == 1) {
+            printf("Column %d doesn't have the required values.\n", colNumber + 1);
             return;
         }
         else {
-            testArray[array[i][n]-1] = 1;
+            testArray[sudoku.array[i][colNumber]-1] = 1;
         }
     }
 }
