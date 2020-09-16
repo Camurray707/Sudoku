@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/chris/Desktop/CS_450/project1/sudoku-project-master/sudoku.c
+stdio.h
+-
+unistd.h
+-
+stdlib.h
+-
+getopt.h
+-
+stdbool.h
+-
+

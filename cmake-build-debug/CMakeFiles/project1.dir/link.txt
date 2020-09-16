@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/project1.dir/sudoku-project-master/sudoku.c.o  -o project1 
