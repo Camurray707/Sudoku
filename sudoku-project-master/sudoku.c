@@ -1,4 +1,5 @@
-#include <stdio.h>  
+#include <stdio.h> 
+#include <string.h> 
 #include <unistd.h> 
 #include <stdlib.h>
 #include <getopt.h>
@@ -44,7 +45,7 @@ void parse_args(int argc, char *argv[])
 
 void row_Valid(int rowNumber, struct Sudoku sudoku);
 void col_Valid(int colNumber, struct Sudoku sudoku);
-void subGrid_Valid(int array[9][9]);
+void subGrid_Valid(int array[9][9], int row, int col);
 
 
 int main(int argc, char *argv[])
@@ -68,8 +69,16 @@ int main(int argc, char *argv[])
             mySudoku.array[i][j] = test;
         }
     }
-    row_Valid(3, mySudoku);
-    col_Valid(4, mySudoku);
+    for (int i = 0; i < 9; i++) {
+        row_Valid(i, mySudoku);
+        col_Valid(i, mySudoku);
+    }
+    
+    for (int start_row = 0; start_row < 9; start_row += 3) {
+        for (int start_col = 0; start_col < 9; start_col += 3) {
+            subGrid_Valid(mySudoku.array, start_row, start_col);
+        }
+    }
 
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
@@ -78,15 +87,18 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
+
     return 0;
 }
+
 
 void row_Valid(int rowNumber, struct Sudoku sudoku) {
     bool testArray[9] = {0,0,0,0,0,0,0,0,0};
 
     for (int i = 0; i < 9; i++) {
         int number = sudoku.array[rowNumber][i];
-        if(sudoku.array[rowNumber][i] < 1 || sudoku.array[rowNumber][i] > 9 || testArray[(sudoku.array[rowNumber][i])-1] == 1) {
+        if(sudoku.array[rowNumber][i] < 1 || sudoku.array[rowNumber][i] > 9 || 
+        testArray[(sudoku.array[rowNumber][i])-1] == 1) {
             printf("Row %d doesn't have the required values.\n", rowNumber + 1);
             return;
         }
@@ -100,7 +112,8 @@ void col_Valid(int colNumber, struct Sudoku sudoku) {
     bool testArray[9] = {0,0,0,0,0,0,0,0,0};
 
     for (int i = 0; i < 9; i++) {
-        if (sudoku.array[i][colNumber] < 1 || sudoku.array[i][colNumber] > 9 || testArray[(sudoku.array[i][colNumber])-1] == 1) {
+        if (sudoku.array[i][colNumber] < 1 || sudoku.array[i][colNumber] > 9 || 
+        testArray[(sudoku.array[i][colNumber])-1] == 1) {
             printf("Column %d doesn't have the required values.\n", colNumber + 1);
             return;
         }
@@ -109,6 +122,40 @@ void col_Valid(int colNumber, struct Sudoku sudoku) {
         }
     }
 }
-void subGrid_Valid(int array[9][9]) {
 
+
+void subGrid_Valid(int array[9][9], int row,int col){
+    bool testArray[9] = {0,0,0,0,0,0,0,0,0};
+    
+    for (int r = row; r < row + 3; r ++) {
+        for (int c = col; c < col + 3; c++) {
+            if(array[r][c] < 1 || array[r][c] > 9 || testArray[(array[r][c])-1] == 1){
+                if(row <= 2)
+                    printf("Top ");
+                else if(row<= 5)
+                    printf("Middle ");
+                else
+                    printf("Bottom ");
+    
+                if(col <= 2)
+                    printf("left ");
+                else if(col <= 5)
+                    printf("center ");
+                else
+                    printf("right ");
+
+                printf("subgrid doesn't have the required values.\n");
+                return;
+            }
+            else {
+            testArray[array[r][c]-1] = 1;
+            }
+        }
+    }
 }
+
+
+
+
+
+
