@@ -5,7 +5,7 @@ CC=gcc
 all: sudoku.x
 
 sudoku.x: sudoku.c
-	${CC} -o $@ ${CFLAGS} ${LDFLAGS} $<
+	${CC} -o $@ ${CFLAGS}  $< ${LDFLAGS}
 
 check: sudoku.x
 	for t in tests/*; do ./sudoku.x < $$t; done
