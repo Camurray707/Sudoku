@@ -17,6 +17,7 @@ struct Sudoku {
     int col_start;
     int sub_row;
     int sub_col;
+    bool validity;
 };
 
 // This is a simple function to parse the --fork argument.
@@ -55,8 +56,8 @@ void *col_Valid(void* arg);
 void *subGrid_Valid(void* arg);
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+
     parse_args(argc, argv);
 
     if (verbose && use_fork) {
@@ -67,16 +68,17 @@ int main(int argc, char *argv[])
 
     printf("Enter a sudoku solution\n");
     int test = 0;
-    struct Sudoku mySudoku;
-    mySudoku.row_start = 0;
-    mySudoku.col_start = 0;
-    mySudoku.sub_col = 0;
-    mySudoku.sub_row = 0;
+    struct Sudoku mySudoku =
+            {mySudoku.row_start = 0,
+            mySudoku.col_start = 0,
+            mySudoku.sub_col = 0,
+            mySudoku.sub_row = 0,
+            mySudoku.validity = true};
 
     //scan from a file using < and place solution in struct array
-    for(int i = 0; i < 9; i++) {
-        for (int j = 0 ; j < 9; j++) {
-            scanf("%d",&test);
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            scanf("%d", &test);
             mySudoku.array[i][j] = test;
         }
     }
@@ -89,22 +91,24 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
-    //threads for row and column checking
-    for (int i = 0; i < 9; i++) {
-        pthread_t rowThread;
-        pthread_create(&rowThread, NULL, row_Valid, &mySudoku);
-        pthread_join(rowThread, NULL);
 
-        pthread_t colThread;
-        pthread_create(&colThread, NULL, col_Valid, &mySudoku);
-        pthread_join(colThread, NULL);
+    //threads for row and column checking
+    pthread_t myThread[26];
+
+    for (int i = 0; i < 9; i++) {
+        pthread_create(&myThread[i], NULL, row_Valid, &mySudoku);
+        pthread_create(&myThread[i+9], NULL, col_Valid, &mySudoku);
+        pthread_create(&myThread[i+18], NULL, subGrid_Valid, &mySudoku);
     }
 
-    //threads for subgrid checking
-    for (int i = 0; i < 3; i++) {
-        pthread_t subGridThread;
-        pthread_create(&subGridThread, NULL, subGrid_Valid, &mySudoku);
-        pthread_join(subGridThread, NULL);
+    for (int i = 0; i < 9; i++) {
+    pthread_join(myThread[i], NULL);
+    pthread_join(myThread[i+9], NULL);
+    pthread_join(myThread[i+18], NULL);
+    }
+
+    if(mySudoku.validity) {
+        printf("This Sudoku solution is a valid solution!\n");
     }
 
     return 0;
@@ -120,8 +124,9 @@ void* row_Valid(void* arg) {
         if(sudoku->array[sudoku->row_start][i] < 1 || sudoku->array[sudoku->row_start][i] > 9 ||
         testArray[(sudoku->array[sudoku->row_start][i])-1] == 1) {
             printf("Row %d doesn't have the required values.\n", sudoku->row_start + 1);
+            sudoku->validity = false;
             sudoku->row_start++;
-            return NULL;
+            pthread_exit(NULL);
         }
         else {
             testArray[sudoku->array[sudoku->row_start][i]-1] = 1;
@@ -140,14 +145,14 @@ void* col_Valid(void* arg) {
         testArray[(sudoku->array[i][sudoku->col_start])-1] == 1) {
             printf("Column %d doesn't have the required values.\n", sudoku->col_start + 1);
             sudoku->col_start++;
-            return NULL;
+            sudoku->validity = false;
+            pthread_exit(NULL);
         }
         else {
             testArray[sudoku->array[i][sudoku->col_start]-1] = 1;
         }
     }
     sudoku->col_start++;
-
 }
 
 
@@ -175,8 +180,12 @@ void* subGrid_Valid(void* arg){
 
                 printf("subgrid doesn't have the required values.\n");
                 sudoku->sub_row+=3;
-                sudoku->sub_col+=3;
-                return NULL;
+                if(sudoku->sub_row == 9) {
+                    sudoku->sub_col+=3;
+                    sudoku->sub_row = 0;
+                }
+                sudoku->validity = false;
+                pthread_exit(NULL);
             }
             else {
             testArray[sudoku->array[r][c]-1] = 1;
@@ -184,7 +193,12 @@ void* subGrid_Valid(void* arg){
         }
     }
     sudoku->sub_row+=3;
-    sudoku->sub_col+=3;
+
+    if(sudoku->sub_row == 9) {
+        sudoku->sub_col+=3;
+        sudoku->sub_row = 0;
+    }
+
 }
 
 
