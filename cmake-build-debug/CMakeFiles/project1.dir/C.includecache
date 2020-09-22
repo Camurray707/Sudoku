@@ -9,6 +9,8 @@
 /home/chris/Desktop/CS_450/project1/sudoku-project-master/sudoku.c
 stdio.h
 -
+string.h
+-
 unistd.h
 -
 stdlib.h
@@ -16,5 +18,9 @@ stdlib.h
 getopt.h
 -
 stdbool.h
+-
+pthread.h
+-
+sys/types.h
 -
 
